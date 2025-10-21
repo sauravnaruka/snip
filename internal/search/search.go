@@ -1,50 +1,27 @@
 package search
 
 import (
-	"encoding/json"
 	"fmt"
-	"os"
 	"strings"
+	"unicode"
 )
 
-type Client struct {
-	dataFilePath *string
-}
-
-type Movie struct {
-	Id          int    `json:"id"`
-	Title       string `json:"title"`
-	Description string `json:"genre"`
-}
-
-type MovieData struct {
-	Movies []Movie `json:"movies"`
-}
-
-func NewClient(pathToDataFile string) *Client {
-	c := Client{
-		dataFilePath: &pathToDataFile,
-	}
-
-	return &c
-}
-
 func (c *Client) SearchMovie(query string) ([]Movie, error) {
-	data, err := os.ReadFile(*c.dataFilePath)
-	if err != nil {
-		return nil, fmt.Errorf("error reading file: %w", err)
+	if query == "" {
+		return nil, nil
 	}
 
-	var movieData MovieData
-	if err := json.Unmarshal(data, &movieData); err != nil {
-		return nil, fmt.Errorf("error parsing JSON: %w", err)
-	}
+	queryLower := removePunctuation(query)
+	tokens := createTokens(queryLower)
+	tokens = removeStopWords(tokens, c.stopWordMap)
+
+	fmt.Printf("Tokens are: %s", tokens)
 
 	var results []Movie
-	queryLower := strings.ToLower(query)
+	for _, movie := range c.movies {
+		titleClean := removePunctuation(movie.Title)
 
-	for _, movie := range movieData.Movies {
-		if strings.Contains(strings.ToLower(movie.Title), queryLower) {
+		if containsAny(titleClean, tokens) {
 			results = append(results, movie)
 		}
 	}
@@ -58,4 +35,41 @@ func (c *Client) SearchMovie(query string) ([]Movie, error) {
 	}
 
 	return results, nil
+}
+
+func removePunctuation(s string) string {
+	var b strings.Builder
+	for _, r := range s {
+		if unicode.IsLetter(r) || unicode.IsNumber(r) || unicode.IsSpace(r) {
+			b.WriteRune(unicode.ToLower(r))
+		}
+	}
+	return b.String()
+}
+
+func createTokens(s string) []string {
+	tokens := strings.Fields(s)
+
+	return tokens
+}
+
+func removeStopWords(tokens []string, dict map[string]string) []string {
+	var result []string
+	for _, t := range tokens {
+		if _, ok := dict[t]; !ok {
+			result = append(result, t)
+		}
+	}
+
+	return result
+}
+
+func containsAny(s string, substrs []string) bool {
+	for _, substr := range substrs {
+		if strings.Contains(s, substr) {
+			return true
+		}
+	}
+
+	return false
 }

@@ -5,12 +5,13 @@ package cmd
 
 import (
 	"fmt"
+	"strings"
 
 	"github.com/SauravNaruka/snip/internal/search"
 	"github.com/spf13/cobra"
 )
 
-func newSearchCmd(searchClient *search.Client) *cobra.Command {
+func getSearchCmd(searchClient *search.Client) *cobra.Command {
 	// searchCmd represents the search command
 	return &cobra.Command{
 		Use:   "search <query>",
@@ -20,9 +21,9 @@ func newSearchCmd(searchClient *search.Client) *cobra.Command {
 	Examples:
 	  app search "Inception"
 	  app search Stranger`,
-		Args: cobra.ExactArgs(1),
+		Args: cobra.MinimumNArgs(1),
 		Run: func(cmd *cobra.Command, args []string) {
-			searchStr := args[0]
+			searchStr := strings.Join(args, " ")
 			fmt.Printf("Searching for: %s\n", searchStr)
 			searchClient.SearchMovie(searchStr)
 		},

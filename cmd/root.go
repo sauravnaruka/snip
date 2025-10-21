@@ -25,7 +25,7 @@ func GetRootCommand(c *search.Client) *cobra.Command {
 		Long:  `Snip uses RAG (Retrieval Augmented Generation).`,
 	}
 
-	rootCmd.AddCommand(newSearchCmd(c))
+	rootCmd.AddCommand(getSearchCmd(c))
 
 	return rootCmd
 }

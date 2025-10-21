@@ -15,12 +15,20 @@ import (
 func main() {
 	godotenv.Load(".env")
 
-	pathToDataFile := os.Getenv("DB_FILE_PATH")
-	if pathToDataFile == "" {
+	dataFilePath := os.Getenv("DB_FILE_PATH")
+	if dataFilePath == "" {
 		log.Fatal("DB_FILE_PATH must be set in env")
 	}
 
-	searchClient := search.NewClient(pathToDataFile)
+	stopWordsFilePath := os.Getenv("STOP_WORD_FILE_PATH")
+	if stopWordsFilePath == "" {
+		log.Fatal("STOP_WORD_FILE_PATH must be set in env")
+	}
+
+	searchClient, err := search.NewClient(dataFilePath, stopWordsFilePath)
+	if err != nil {
+		log.Fatal("Error creating search client %w", err)
+	}
 
 	rootCmd := cmd.GetRootCommand(searchClient)
 	startRepl(rootCmd)

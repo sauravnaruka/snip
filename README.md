@@ -45,7 +45,8 @@ go get github.com/joho/godotenv
    Create a `.env` file in the project root:
    Add following fields to `.env` file
 
-`DB_FILE_PATH`: Location of data file
+- `DB_FILE_PATH`: Location of data file
+- `STOP_WORD_FILE_PATH`: Location of stop word file
 
 4. Data file
    Create data file at .<Project-root>/data/movies.json
