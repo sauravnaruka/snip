@@ -69,3 +69,34 @@ Option 2 — Build and run
 go build -o snip
 ./snip
 ```
+
+## Search
+
+### Text Preprocessing
+
+To improve keyword-based search accuracy, we need to normalize both the query and the target text through a few preprocessing steps. For instance, the words run, Run, and running should all be recognized as the same keyword during search.
+
+Following are text processing Steps
+
+#### 1. Case Insensitivity
+
+Search should be case-insensitive. Both the query and the target text are converted to the same case (usually lowercase) so that run and Run are treated as the same word.
+
+#### 2. Punctuation Handling
+
+Punctuation marks should not affect search results. For example, the tokens run, run., and run! should all be treated as the same word after removing punctuation.
+
+#### 3. Tokenization
+
+The input text needs to be split into individual tokens (words) for further processing and matching.For example:
+
+- input `"Running fast, he reached the goal."`
+- Output `["Running", "fast", "he", "reached", "the", "goal"]`
+
+#### 4. Remove Stop Words
+
+words that don't have much semantic meaning are called `stop words`. We will remove them from our search. Example of stop words are `the`, `a`, `is`, `of`, `in`
+
+#### 5. Stemming
+
+Each token should be reduced to its stem (base) form so that words derived from the same root are matched together. For example `running` should convert to `run`

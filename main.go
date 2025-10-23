@@ -4,6 +4,7 @@ Copyright © 2025 NAME HERE <EMAIL ADDRESS>
 package main
 
 import (
+	"fmt"
 	"log"
 	"os"
 
@@ -31,5 +32,18 @@ func main() {
 	}
 
 	rootCmd := cmd.GetRootCommand(searchClient)
-	startRepl(rootCmd)
+
+	if len(os.Args) > 1 {
+		// Run Cobra command directly
+		rootCmd.SetArgs(os.Args[1:])
+		if err := rootCmd.Execute(); err != nil {
+			fmt.Fprintf(os.Stderr, "Error: %v\n", err)
+			os.Exit(1)
+		}
+		return
+	}
+
+	rootCmd.Help()
+
+	// startRepl(rootCmd)
 }

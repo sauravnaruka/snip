@@ -4,6 +4,8 @@ import (
 	"fmt"
 	"strings"
 	"unicode"
+
+	"github.com/kljensen/snowball"
 )
 
 func (c *Client) SearchMovie(query string) ([]Movie, error) {
@@ -11,11 +13,9 @@ func (c *Client) SearchMovie(query string) ([]Movie, error) {
 		return nil, nil
 	}
 
-	queryLower := removePunctuation(query)
-	tokens := createTokens(queryLower)
-	tokens = removeStopWords(tokens, c.stopWordMap)
+	tokens := preProcessQuery(query, c.stopWordMap)
 
-	fmt.Printf("Tokens are: %s", tokens)
+	fmt.Printf("Tokens are: %s\n", tokens)
 
 	var results []Movie
 	for _, movie := range c.movies {
@@ -30,11 +30,14 @@ func (c *Client) SearchMovie(query string) ([]Movie, error) {
 		fmt.Println("No movies found.")
 	}
 
-	for i, movie := range results {
-		fmt.Printf("%d. %s\n", i+1, movie.Title)
-	}
-
 	return results, nil
+}
+
+func preProcessQuery(query string, stopWordMap map[string]struct{}) []string {
+	queryLower := removePunctuation(query)
+	tokens := createTokens(queryLower)
+	tokens = processTokens(tokens, stopWordMap)
+	return tokens
 }
 
 func removePunctuation(s string) string {
@@ -53,15 +56,28 @@ func createTokens(s string) []string {
 	return tokens
 }
 
-func removeStopWords(tokens []string, dict map[string]string) []string {
+func processTokens(tokens []string, stopWordMap map[string]struct{}) []string {
 	var result []string
-	for _, t := range tokens {
-		if _, ok := dict[t]; !ok {
-			result = append(result, t)
+	for _, token := range tokens {
+		if !isStopWord(token, stopWordMap) {
+
+			stemmed, err := snowball.Stem(token, "english", false)
+			if err != nil {
+				fmt.Printf("Error while converting word %s to stem.\n Error: %v", token, err)
+				result = append(result, token)
+				continue
+			}
+
+			result = append(result, stemmed)
 		}
 	}
 
 	return result
+}
+
+func isStopWord(token string, stopWordMap map[string]struct{}) bool {
+	_, ok := stopWordMap[token]
+	return ok
 }
 
 func containsAny(s string, substrs []string) bool {

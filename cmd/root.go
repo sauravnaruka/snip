@@ -23,6 +23,11 @@ func GetRootCommand(c *search.Client) *cobra.Command {
 		Use:   "snip",
 		Short: "Snip is a search tool for internal database",
 		Long:  `Snip uses RAG (Retrieval Augmented Generation).`,
+		Run: func(cmd *cobra.Command, args []string) {
+			// This runs when no subcommand is provided
+			fmt.Println("Available Commands:")
+			cmd.Help()
+		},
 	}
 
 	rootCmd.AddCommand(getSearchCmd(c))

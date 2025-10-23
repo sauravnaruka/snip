@@ -25,7 +25,16 @@ func getSearchCmd(searchClient *search.Client) *cobra.Command {
 		Run: func(cmd *cobra.Command, args []string) {
 			searchStr := strings.Join(args, " ")
 			fmt.Printf("Searching for: %s\n", searchStr)
-			searchClient.SearchMovie(searchStr)
+
+			results, err := searchClient.SearchMovie(searchStr)
+			if err != nil {
+				fmt.Printf("Search faild with error: %v", err)
+				return
+			}
+
+			for i, movie := range results {
+				fmt.Printf("%d. %s\n", i+1, movie.Title)
+			}
 		},
 	}
 }

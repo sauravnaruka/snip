@@ -9,7 +9,7 @@ import (
 
 type Client struct {
 	movies      []Movie
-	stopWordMap map[string]string
+	stopWordMap map[string]struct{}
 }
 
 type Movie struct {
@@ -39,15 +39,13 @@ func NewClient(dataFilePath string, stopWordsFilePath string) (*Client, error) {
 	}
 
 	stopWords := strings.Fields(string(stopWordsData))
-	stopWordMap := make(map[string]string, len(stopWords))
+	stopWordMap := make(map[string]struct{}, len(stopWords))
 	for _, w := range stopWords {
-		stopWordMap[w] = ""
+		stopWordMap[strings.ToLower(w)] = struct{}{}
 	}
 
-	c := Client{
+	return &Client{
 		movies:      movieData.Movies,
 		stopWordMap: stopWordMap,
-	}
-
-	return &c, nil
+	}, nil
 }
