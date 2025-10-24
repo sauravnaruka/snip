@@ -72,6 +72,12 @@ go build -o snip
 
 ## Search
 
+Search works in following steps:
+**Prerequisite**: [Inverted Index](#inverted-index) needs to be build before the search operation, using the `build` command
+
+1. User query [text is preprocessed](#Text-Preprocessing) and converted into a list of tokens
+2. List of tokens are searched based on [Inverted Index](#inverted-index). In Inverted index we maintain token -> Movie mapping. Therefore we fetch movies for each token. Once we get 5 results, we break from the search
+
 ### Text Preprocessing
 
 To improve keyword-based search accuracy, we need to normalize both the query and the target text through a few preprocessing steps. For instance, the words run, Run, and running should all be recognized as the same keyword during search.

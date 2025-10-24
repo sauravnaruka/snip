@@ -2,26 +2,19 @@ package search
 
 import (
 	"fmt"
-	"strings"
 )
 
-func (idx *Client) SearchMovie(query string) ([]Movie, error) {
+func (c *Client) SearchMovie(query string) ([]Movie, error) {
 	if query == "" {
 		return nil, nil
 	}
 
-	tokens := preProcessQuery(query, idx.stopWordMap)
+	tokens := preProcessQuery(query, c.stopWordMap)
+	fmt.Printf("User query tokens are: %s\n", tokens)
 
-	fmt.Printf("Tokens are: %s\n", tokens)
+	c.invertedIndex.load()
 
-	var results []Movie
-	for _, movie := range idx.movies {
-		titleClean := removePunctuation(movie.Title)
-
-		if containsAny(titleClean, tokens) {
-			results = append(results, movie)
-		}
-	}
+	results := c.findMoviesByTokens(tokens)
 
 	if len(results) == 0 {
 		fmt.Println("No movies found.")
@@ -30,12 +23,33 @@ func (idx *Client) SearchMovie(query string) ([]Movie, error) {
 	return results, nil
 }
 
-func containsAny(s string, substrs []string) bool {
-	for _, substr := range substrs {
-		if strings.Contains(s, substr) {
-			return true
+func (c *Client) findMoviesByTokens(tokens []string) []Movie {
+	docIDs := make(map[int]struct{})
+
+outerLoop:
+	for _, token := range tokens {
+		ids := c.invertedIndex.getDocumentIDs(token)
+
+		for _, id := range ids {
+			docIDs[id] = struct{}{}
+
+			if len(docIDs) == 5 {
+				break outerLoop
+			}
 		}
 	}
 
-	return false
+	results := make([]Movie, 0, len(docIDs))
+	for id := range docIDs {
+		m, ok := c.invertedIndex.getMovieByID(id)
+		if !ok {
+			fmt.Printf("Warning: movie with id=%v, not found\n", id)
+			continue
+		}
+
+		results = append(results, m)
+	}
+
+	return results
+
 }

@@ -33,7 +33,7 @@ func getSearchCmd(searchClient *search.Client) *cobra.Command {
 			}
 
 			for i, movie := range results {
-				fmt.Printf("%d. %s\n", i+1, movie.Title)
+				fmt.Printf("%d. (%v) %s\n", i+1, movie.Id, movie.Title)
 			}
 		},
 	}
