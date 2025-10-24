@@ -8,18 +8,9 @@ import (
 )
 
 type Client struct {
-	movies      []Movie
-	stopWordMap map[string]struct{}
-}
-
-type Movie struct {
-	Id          int    `json:"id"`
-	Title       string `json:"title"`
-	Description string `json:"description"`
-}
-
-type MovieData struct {
-	Movies []Movie `json:"movies"`
+	movies        []Movie
+	stopWordMap   map[string]struct{}
+	invertedIndex *InvertedIndex
 }
 
 func NewClient(dataFilePath string, stopWordsFilePath string) (*Client, error) {
@@ -44,8 +35,11 @@ func NewClient(dataFilePath string, stopWordsFilePath string) (*Client, error) {
 		stopWordMap[strings.ToLower(w)] = struct{}{}
 	}
 
-	return &Client{
-		movies:      movieData.Movies,
-		stopWordMap: stopWordMap,
-	}, nil
+	client := &Client{
+		movies:        movieData.Movies,
+		stopWordMap:   stopWordMap,
+		invertedIndex: newInvertedIndex(),
+	}
+
+	return client, nil
 }

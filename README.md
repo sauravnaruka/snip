@@ -100,3 +100,23 @@ words that don't have much semantic meaning are called `stop words`. We will rem
 #### 5. Stemming
 
 Each token should be reduced to its stem (base) form so that words derived from the same root are matched together. For example `running` should convert to `run`
+
+### TF-IDF
+
+#### Inverted Index
+
+An inverted index make search fast, it's like a SQL database index but for text. Instead of searching for all the documents each time a user searches, we build and index for fast lookup.
+
+- Forward index maps location to value. eg: `doc1: [matrix, reload]`
+- Inverted index maps value (token) to location. eg: `matrix: [doc1, doc5]`
+
+We build inverted index in `internal/search` module.
+
+1. We use struct `InvertedIndex` to store
+
+- `Index` which maps tokens to set of document IDs
+- `DocMap` which maps document IDs to the movie object
+
+2. When `BuildInvertedIndex` called from cmd module it iterate through all the movies, create token from title and description, then call `addDocument`
+
+3. `addDcoument` create a mapping of token and corresponding document id

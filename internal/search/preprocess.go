@@ -8,31 +8,6 @@ import (
 	"github.com/kljensen/snowball"
 )
 
-func (c *Client) SearchMovie(query string) ([]Movie, error) {
-	if query == "" {
-		return nil, nil
-	}
-
-	tokens := preProcessQuery(query, c.stopWordMap)
-
-	fmt.Printf("Tokens are: %s\n", tokens)
-
-	var results []Movie
-	for _, movie := range c.movies {
-		titleClean := removePunctuation(movie.Title)
-
-		if containsAny(titleClean, tokens) {
-			results = append(results, movie)
-		}
-	}
-
-	if len(results) == 0 {
-		fmt.Println("No movies found.")
-	}
-
-	return results, nil
-}
-
 func preProcessQuery(query string, stopWordMap map[string]struct{}) []string {
 	queryLower := removePunctuation(query)
 	tokens := createTokens(queryLower)
@@ -78,14 +53,4 @@ func processTokens(tokens []string, stopWordMap map[string]struct{}) []string {
 func isStopWord(token string, stopWordMap map[string]struct{}) bool {
 	_, ok := stopWordMap[token]
 	return ok
-}
-
-func containsAny(s string, substrs []string) bool {
-	for _, substr := range substrs {
-		if strings.Contains(s, substr) {
-			return true
-		}
-	}
-
-	return false
 }
