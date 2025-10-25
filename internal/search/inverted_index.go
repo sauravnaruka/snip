@@ -76,14 +76,6 @@ func (idx *InvertedIndex) getMovieByID(id int) (Movie, bool) {
 	return movie, ok
 }
 
-func (idx *InvertedIndex) getTF(docID int, token string) int {
-	if freqCounter, ok := idx.TermFrequencies[docID]; ok {
-		// Returns 0 if token not found
-		return freqCounter[token]
-	}
-	return 0
-}
-
 func (idx *InvertedIndex) save() error {
 	return idx.saveToPath("cache/inverted_index.gob")
 }
@@ -143,4 +135,12 @@ func (idx *InvertedIndex) loadFromPath(filePath string) error {
 	}
 
 	return nil
+}
+
+func (idx *InvertedIndex) getTF(docID int, token string) int {
+	if freqCounter, ok := idx.TermFrequencies[docID]; ok {
+		// Returns 0 if token not found
+		return freqCounter[token]
+	}
+	return 0
 }

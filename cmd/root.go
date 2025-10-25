@@ -35,6 +35,7 @@ func GetRootCommand(c *search.Client) *cobra.Command {
 	rootCmd.AddCommand(getTFCmd(c))
 	rootCmd.AddCommand(getIDFCmd(c))
 	rootCmd.AddCommand(getTFIDFCmd(c))
+	rootCmd.AddCommand(getBM25IDFCmd(c))
 
 	return rootCmd
 }

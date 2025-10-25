@@ -162,3 +162,34 @@ In a movie database, the word movie or actor will be used multiple times while w
 ```
 math.log((doc_count + 1) / (term_doc_count + 1))
 ```
+
+### BM25
+
+BM25 ([Okapi BM25](https://en.wikipedia.org/wiki/Okapi_BM25)) is an improvement over [TF-IDF](#TF-IDF).
+
+#### BM25 Improvements over IDF
+
+BM25 gives More stable IDF calculations.
+
+The origina [IDF](<#Inverse_Document_Frequency_(IDF)>) calculation is as follows:
+
+```
+math.log((doc_count + 1) / (term_doc_count + 1))
+```
+
+The problems with this formula:
+
+- Division by zero. We solved this by adding 1 in above formula.
+- In case of rare term we get high IDF.
+- Very common terms can get negative scores.
+
+**BM25-IDF folmula is**
+
+```
+BM25-IDF = log((doc_count - term_doc_count + 0.5) / (term_doc_count + 0.5) + 1)
+```
+
+Where,
+
+- `doc_count - term_doc_count + 0.5` is count of documents without the term + smoothing (laplace smoothing) to prevent division by `0`
+- `term_doc_count + 0.5` is count of documents with the term + smoothing (laplace smoothing) to prevent division by `0`
