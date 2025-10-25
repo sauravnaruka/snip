@@ -109,6 +109,19 @@ Each token should be reduced to its stem (base) form so that words derived from 
 
 ### TF-IDF
 
+Term Frequency & Inverse Dcoument Frequency are often used together to create TF-IDF.
+
+```
+TF-IDF = TF * IDF
+```
+
+- TF (Term Frequency): How often a term appears in a document
+- IDF (Inverse Document Frequency): How rare a term is across all document
+
+- Frequent words gets higger TF score
+- Rare words gets high IDF score
+- Best matches have both high TF & high IDF
+
 #### Inverted Index
 
 An inverted index make search fast, it's like a SQL database index but for text. Instead of searching for all the documents each time a user searches, we build and index for fast lookup.
