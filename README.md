@@ -48,6 +48,7 @@ go get github.com/joho/godotenv
 - `DB_FILE_PATH`: Location of data file
 - `STOP_WORD_FILE_PATH`: Location of stop word file
 - `BM25_K1`: Tunable parameter that controls the diminishing returns for BM25 algo. Default is `1.5`
+- `BM25_B`: Tunable parameter that controls how much we care about document length.
 
 4. Data file
    Create data file at .<Project-root>/data/movies.json
@@ -70,6 +71,9 @@ Option 2 — Build and run
 go build -o snip
 ./snip
 ```
+
+> [!IMPORTANT] <br> **Important:** Before running the program, make sure to build inverted index using the command
+> `go run . build` or `snip build`
 
 ## Search
 
@@ -108,7 +112,9 @@ words that don't have much semantic meaning are called `stop words`. We will rem
 
 Each token should be reduced to its stem (base) form so that words derived from the same root are matched together. For example `running` should convert to `run`
 
-### TF-IDF
+### Keyword Search
+
+#### TF-IDF
 
 Term Frequency & Inverse Dcoument Frequency are often used together to create TF-IDF.
 
@@ -123,7 +129,7 @@ TF-IDF = TF * IDF
 - Rare words gets high IDF score
 - Best matches have both high TF & high IDF
 
-#### Inverted Index
+##### Inverted Index
 
 An inverted index make search fast, it's like a SQL database index but for text. Instead of searching for all the documents each time a user searches, we build and index for fast lookup.
 
@@ -141,7 +147,7 @@ We build inverted index in `internal/search` module.
 
 3. `addDcoument` create a mapping of token and corresponding document id
 
-#### Term Frequency
+##### Term Frequency
 
 Term frequency (TF) measures how often a word appears in a document.
 
@@ -151,7 +157,7 @@ However this led to keyword over use called keyword stuffing.
 
 In out program, we also building `TermFrequencies`, It's a dictionary of document ID with a dictionary of token and it's frequency in the document.
 
-#### Inverse Document Frequency (IDF)
+##### Inverse Document Frequency (IDF)
 
 Inverse Document Frequency (IDF) prioritize the words which are rare over the words which are generic.
 
@@ -164,11 +170,11 @@ In a movie database, the word movie or actor will be used multiple times while w
 math.log((doc_count + 1) / (term_doc_count + 1))
 ```
 
-### BM25
+#### BM25
 
 BM25 ([Okapi BM25](https://en.wikipedia.org/wiki/Okapi_BM25)) is an improvement over [TF-IDF](#TF-IDF).
 
-#### BM25 Improvements over IDF
+##### BM25 Improvements over IDF
 
 BM25 gives More stable IDF calculations.
 
@@ -195,7 +201,7 @@ Where,
 - `doc_count - term_doc_count + 0.5` is count of documents without the term + smoothing (laplace smoothing) to prevent division by `0`
 - `term_doc_count + 0.5` is count of documents with the term + smoothing (laplace smoothing) to prevent division by `0`
 
-#### BM25 Improvements over Term Frequency (TF)
+##### BM25 Improvements over Term Frequency (TF)
 
 BM25 does term frequency saturation. In standard (TF)[#Term_Frequency] we simply caclulate the number of times a term apeared in token.
 
@@ -224,3 +230,24 @@ Where,
 | 5              | 5        | 1.9                |
 | 10             | 10       | 2.2                |
 | 20             | 20       | 2.3                |
+
+##### BM25 Normaliz document Length
+
+The (TF)[#Term_Frequency] calculation benifit longer text as longer text has more words thus higher TF score.
+
+BM25 improves the TF calculation by normalizing document length, ensuring longer documents don't get unfair advantanges over shorter, more focused once.
+
+```
+length_norm = 1 - b + (b * (doc_length / avg_doc_length))
+
+BM25-TF = (TF * (k1 + 1)) / (TF + k1 * length_norm)
+```
+
+- If `b=0` then length norm is always 1. Thus no effect
+- If `b=1` then full normalization is applied
+- Usually the value of `b=0.75`
+
+**Key Insight**
+
+- Longer documents are penalized
+- Shorter documents are boosted

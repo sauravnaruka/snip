@@ -28,7 +28,6 @@ func main() {
 	}
 
 	BM25_K1 := 1.5
-
 	BM25_K1_STR := os.Getenv("BM25_K1")
 	if BM25_K1_STR == "" {
 		fmt.Printf("BM25_K1 is empty in env file. Taking the default\n")
@@ -41,7 +40,20 @@ func main() {
 		}
 	}
 
-	searchClient, err := search.NewClient(dataFilePath, stopWordsFilePath, BM25_K1)
+	BM25_B := 0.75
+	BM25_B_STR := os.Getenv("BM25_B")
+	if BM25_B_STR == "" {
+		fmt.Printf("BM25_B is empty in env file. Taking the default\n")
+	} else {
+		envBM25B, err := strconv.ParseFloat(BM25_B_STR, 64)
+		if err != nil {
+			fmt.Printf("Error converting env BM25_B value '%s' with error %v\n", BM25_B_STR, err)
+		} else {
+			BM25_B = envBM25B
+		}
+	}
+
+	searchClient, err := search.NewClient(dataFilePath, stopWordsFilePath, BM25_K1, BM25_B)
 	if err != nil {
 		log.Fatal("Error creating search client %w", err)
 	}

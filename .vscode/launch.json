@@ -10,7 +10,7 @@
       "request": "launch",
       "mode": "debug",
       "program": "${workspaceFolder}",
-      "args": ["tf", "424", "trapper"]
+      "args": ["bm25tf", "1", "maya"]
     }
   ]
 }

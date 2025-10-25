@@ -15,6 +15,9 @@ type InvertedIndex struct {
 	// DocMap maps document IDs to their full Movie objects
 	DocMap map[int]Movie
 
+	// Track document length
+	DocLengthMap map[int]int
+
 	// map[docId]map[token]frequency
 	TermFrequencies map[int]map[string]int
 }
@@ -23,6 +26,7 @@ func newInvertedIndex() *InvertedIndex {
 	return &InvertedIndex{
 		Index:           make(map[string]map[int]struct{}),
 		DocMap:          make(map[int]Movie),
+		DocLengthMap:    make(map[int]int),
 		TermFrequencies: make(map[int]map[string]int),
 	}
 }
@@ -54,6 +58,7 @@ func (idx *InvertedIndex) addDocument(docID int, tokens []string, movie Movie) {
 	}
 
 	idx.DocMap[docID] = movie
+	idx.DocLengthMap[docID] = len(tokens)
 }
 
 func (idx *InvertedIndex) getDocumentIDs(token string) []int {
@@ -106,6 +111,10 @@ func (idx *InvertedIndex) saveToPath(filePath string) error {
 		return fmt.Errorf("failed to encode TermFrequencies: %w", err)
 	}
 
+	if err := encoder.Encode(idx.DocLengthMap); err != nil {
+		return fmt.Errorf("failed to encode DocLengthMap: %w", err)
+	}
+
 	return nil
 }
 
@@ -134,6 +143,10 @@ func (idx *InvertedIndex) loadFromPath(filePath string) error {
 		return fmt.Errorf("failed to decode TermFrequencies: %w", err)
 	}
 
+	if err := decoder.Decode(&idx.DocLengthMap); err != nil {
+		return fmt.Errorf("failed to decode DocLengthMap: %w", err)
+	}
+
 	return nil
 }
 
@@ -143,4 +156,18 @@ func (idx *InvertedIndex) getTF(docID int, token string) int {
 		return freqCounter[token]
 	}
 	return 0
+}
+
+func (idx *InvertedIndex) getAvgDocLength() float64 {
+	totalDocuments := len(idx.DocLengthMap)
+	if totalDocuments == 0 {
+		return 0.0
+	}
+
+	totalLength := 0
+	for _, docLength := range idx.DocLengthMap {
+		totalLength += docLength
+	}
+
+	return float64(totalLength) / float64(totalDocuments)
 }
