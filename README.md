@@ -136,3 +136,16 @@ Early search engine relied on Term Frequency only. Where they use to scan a text
 However this led to keyword over use called keyword stuffing.
 
 In out program, we also building `TermFrequencies`, It's a dictionary of document ID with a dictionary of token and it's frequency in the document.
+
+#### Inverse Document Frequency (IDF)
+
+Inverse Document Frequency (IDF) prioritize the words which are rare over the words which are generic.
+
+For example the text "A movie about an actor who becomes a coding instructor".
+In a movie database, the word movie or actor will be used multiple times while word like coding or instructor might be less frequent. With Inverse Dcoument Frequency we can prioritize words like 'coding' or 'instructor' over the generic word for the dataset like 'actor' or 'movie'
+
+**Document frequency (DF)** measures how many documents in the dataset contain a term. The more documents a term appears in, the bigger its value, we don't want that. So we take **inverse**, It's because we want rare terms to have higher scores.
+
+```
+math.log((doc_count + 1) / (term_doc_count + 1))
+```
