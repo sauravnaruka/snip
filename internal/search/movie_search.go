@@ -12,8 +12,6 @@ func (c *Client) SearchMovie(query string) ([]Movie, error) {
 	tokens := preProcessQuery(query, c.stopWordMap)
 	fmt.Printf("User query tokens are: %s\n", tokens)
 
-	c.invertedIndex.load()
-
 	results := c.findMoviesByTokens(tokens)
 
 	if len(results) == 0 {

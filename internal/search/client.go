@@ -40,6 +40,7 @@ func NewClient(dataFilePath string, stopWordsFilePath string) (*Client, error) {
 		stopWordMap:   stopWordMap,
 		invertedIndex: newInvertedIndex(),
 	}
+	client.invertedIndex.load()
 
 	return client, nil
 }

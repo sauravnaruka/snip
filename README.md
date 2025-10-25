@@ -126,3 +126,13 @@ We build inverted index in `internal/search` module.
 2. When `BuildInvertedIndex` called from cmd module it iterate through all the movies, create token from title and description, then call `addDocument`
 
 3. `addDcoument` create a mapping of token and corresponding document id
+
+#### Term Frequency
+
+Term frequency (TF) measures how often a word appears in a document.
+
+Early search engine relied on Term Frequency only. Where they use to scan a text and find frequency of token. A document containg a lot of token user searched considered more relevant.
+
+However this led to keyword over use called keyword stuffing.
+
+In out program, we also building `TermFrequencies`, It's a dictionary of document ID with a dictionary of token and it's frequency in the document.
