@@ -47,6 +47,7 @@ go get github.com/joho/godotenv
 
 - `DB_FILE_PATH`: Location of data file
 - `STOP_WORD_FILE_PATH`: Location of stop word file
+- `BM25_K1`: Tunable parameter that controls the diminishing returns for BM25 algo. Default is `1.5`
 
 4. Data file
    Create data file at .<Project-root>/data/movies.json
@@ -193,3 +194,33 @@ Where,
 
 - `doc_count - term_doc_count + 0.5` is count of documents without the term + smoothing (laplace smoothing) to prevent division by `0`
 - `term_doc_count + 0.5` is count of documents with the term + smoothing (laplace smoothing) to prevent division by `0`
+
+#### BM25 Improvements over Term Frequency (TF)
+
+BM25 does term frequency saturation. In standard (TF)[#Term_Frequency] we simply caclulate the number of times a term apeared in token.
+
+The issue is that a single term appearing a lot of times can get exponentially more weight. For example
+
+- Document A: Title: Run Run Run, Description: A thrilling chase where the hero runs to save the day. Run faster!
+- Document B: Title: Runaway Bride, Description: A romantic comedy about a bride who escapes her wedding.
+
+Now when user search `run bride`, the document A gets higher prefrence because the number of times run apeared in document A.
+
+BM25 uses diminishing returns after certain points. Additional occurrences matter less.
+
+```
+BM25-TF = (TF * (k1 + 1)) / (TF + k1)
+```
+
+Where,
+
+- `TF` is the term frequency
+- `K1` is tunable parameter that controls the diminsihing returns. A common value is `1.5`.
+
+| Term Frequency | Basic TF | BM25 TF (k₁ = 1.5) |
+| -------------- | -------- | ------------------ |
+| 1              | 1        | 1.0                |
+| 2              | 2        | 1.4                |
+| 5              | 5        | 1.9                |
+| 10             | 10       | 2.2                |
+| 20             | 20       | 2.3                |

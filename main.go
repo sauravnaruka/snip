@@ -7,6 +7,7 @@ import (
 	"fmt"
 	"log"
 	"os"
+	"strconv"
 
 	"github.com/SauravNaruka/snip/cmd"
 	"github.com/SauravNaruka/snip/internal/search"
@@ -26,7 +27,21 @@ func main() {
 		log.Fatal("STOP_WORD_FILE_PATH must be set in env")
 	}
 
-	searchClient, err := search.NewClient(dataFilePath, stopWordsFilePath)
+	BM25_K1 := 1.5
+
+	BM25_K1_STR := os.Getenv("BM25_K1")
+	if BM25_K1_STR == "" {
+		fmt.Printf("BM25_K1 is empty in env file. Taking the default\n")
+	} else {
+		envBM25K1, err := strconv.ParseFloat(BM25_K1_STR, 64)
+		if err != nil {
+			fmt.Printf("Error converting env BM25_K1 value '%s' with error %v\n", BM25_K1_STR, err)
+		} else {
+			BM25_K1 = envBM25K1
+		}
+	}
+
+	searchClient, err := search.NewClient(dataFilePath, stopWordsFilePath, BM25_K1)
 	if err != nil {
 		log.Fatal("Error creating search client %w", err)
 	}

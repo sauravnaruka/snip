@@ -11,9 +11,10 @@ type Client struct {
 	movies        []Movie
 	stopWordMap   map[string]struct{}
 	invertedIndex *InvertedIndex
+	BM25_K1       float64
 }
 
-func NewClient(dataFilePath string, stopWordsFilePath string) (*Client, error) {
+func NewClient(dataFilePath string, stopWordsFilePath string, BM25_K1 float64) (*Client, error) {
 	movieDataRaw, err := os.ReadFile(dataFilePath)
 	if err != nil {
 		return nil, fmt.Errorf("error reading file: %w", err)
@@ -39,6 +40,7 @@ func NewClient(dataFilePath string, stopWordsFilePath string) (*Client, error) {
 		movies:        movieData.Movies,
 		stopWordMap:   stopWordMap,
 		invertedIndex: newInvertedIndex(),
+		BM25_K1:       BM25_K1,
 	}
 	client.invertedIndex.load()
 
