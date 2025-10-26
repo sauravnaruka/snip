@@ -174,6 +174,17 @@ math.log((doc_count + 1) / (term_doc_count + 1))
 
 BM25 ([Okapi BM25](https://en.wikipedia.org/wiki/Okapi_BM25)) is an improvement over [TF-IDF](#TF-IDF).
 
+The formula for BM25 Search is:
+
+```
+BM25 = bm25_tf * bm25_idf
+
+Where,
+- bm25_idf = log((doc_count - term_doc_count + 0.5) / (term_doc_count + 0.5) + 1)
+- bm25_tf = (TF * (k1 + 1)) / (TF + k1 * length_norm)
+- length_norm = 1 - b + (b * (doc_length / avg_doc_length))
+```
+
 ##### BM25 Improvements over IDF
 
 BM25 gives More stable IDF calculations.
