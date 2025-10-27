@@ -281,3 +281,135 @@ For semantic search we will use embeddings as [vectors](<https://en.wikipedia.or
 We use vector as now the distance between the vectors represents how similar the meaning of the words are.
 
 The process of converting text to vector is essentially a machine learning problem where a lot of data is used and a lot of computations are performed on the data to learn patterns about how different words and phrases relate to each other.
+
+#### Vector Dimensions
+
+Dimensions are just list of numbers or entries making one dimension. To capture semantic value we use vector some times containg 300+ dimensions.
+
+Then we calculate distance between two vectors which tells us how similar or different are these things.
+
+#### Vector Operations
+
+We can perform actions on vector to optimize it further
+
+##### Vector Addition
+
+Vector addition is useful for combining/mixing concepts. For example, I want result that's like this and like that
+
+##### Vector Subtraction
+
+Vector subtraction is useful for removing concepts. For example, I want a result that's like this but not that.
+
+##### Vector Dot Product
+
+We perform dot product to see how similar two embeddings (vector) are. The dot product measure how much two vector "point in the same direction"
+
+It's calculated by multiplying corresponding elements and then summing the result.
+
+Python has popular library called NumPy to handle vector math.
+
+> [!tip]
+>
+> - The More similar the vectors are, the higher the dot product will be.
+> - If Opposite are the vectors, the dot product will be negative
+
+Formula for the Dot product is
+
+```
+dot_product(A,B) = A_x \times B_x + A_y \times B_y
+```
+
+Code for same is
+
+```py
+def dot(vec1, vec2):
+    if len(vec1) != len(vec2):
+        raise ValueError("vectors must be the same length")
+    total = 0.0
+    for i in range(len(vec1)):
+        total += vec1[i] * vec2[i]
+    return total
+```
+
+##### Cosine Similarity
+
+The dot product is a useful way to measure the similarity between two vectors.
+However, it is influenced by the magnitude (length) of those vectors — which represents strength or confidence — rather than just their direction.
+
+In semantic search, we usually care about how similar the meanings (directions) are, not how strong or confident each vector is.
+
+That’s where cosine similarity comes in — it measures the angle between two vectors, effectively ignoring their lengths.
+
+The formula for cosine similarity is:
+
+```
+cosine_similarity = dot_product(A, B) / (magnitude(A) × magnitude(B))
+```
+
+###### Relationship Between Dot Product and Cosine Similarity
+
+The dot product of two vectors can be expressed in two equivalent ways:
+
+1. Algebraic form (components-wise):
+
+```
+dot_product(A,B) = A_x \times B_x + A_y \times B_y
+```
+
+2. Geometric form (based on the angle between them):
+
+```
+dot_product(A,B) = |A| |B| cos(θ)
+```
+
+Where,
+
+- ∣A∣ = magnitude (length) of vector A
+- ∣B∣ = magnitude (length) of vector B
+- θ = angle between the two vectors
+
+Magnitude is also called **Euclidean norm**. The code for the same is:
+
+```py
+def euclidean_norm(vec):
+    total = 0.0
+    for x in vec:
+        total += x**2
+
+    return total**0.5
+```
+
+Following is the formula to calculate magnitude. This should be reminiscent of the Pythagorean theorem.
+
+```
+|A| = sqrt((A_x)^2 + (A_y)^2)
+```
+
+By substituting the two forms of the dot product, we get:
+
+```
+cos(θ) = \frac{A_x \times B_x + A_y \times B_y} / {|A| \times |B|}
+```
+
+This gives us the formula for cosine similarity:
+
+```
+cosine_similarity = dot_product(A, B) / (magnitude(A) × magnitude(B))
+```
+
+Now, the value of cosine_similarity ranges from `-1.0` to `1.0`. Where
+
+- `1.0`: Vector point in exactly the same direction (perfectly similar)
+- `0.0`: Vectors are perpendicular (no similarity)
+- `-1.0`: Vectors point in opposite directions (perfectly dissimilar)
+
+In summary it works in two steps:
+
+1. Calculate similarity: The dot product measures how much vectors align
+2. Remove length bias: Dividing by magnitudes removes the effect of vector size
+
+###### Why Cosine Similarity
+
+We want to use the same metric for similarity comparison as used by the model during the training process. The model we using is all-MiniLM-L6-v2 which used cosine similarity during training.
+
+Another great news is that cosine similarity is used by most embedding models
