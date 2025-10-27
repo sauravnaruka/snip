@@ -75,6 +75,13 @@ go build -o snip
 > [!IMPORTANT] <br> **Important:** Before running the program, make sure to build inverted index using the command
 > `go run . build` or `snip build`
 
+## 🧰 Python CLI Utilities
+
+Some auxiliary tools for data preparation and experimentation are implemented in Python under the [`cli/`](./cli) folder.  
+These scripts are isolated from the Go application and use a local virtual environment managed by **uv**.
+
+If you plan to use or modify the Python utilities, see the detailed setup instructions in [`cli/README.md`](./cli/README.md).
+
 ## Search
 
 Search works in following steps:
@@ -262,3 +269,15 @@ BM25-TF = (TF * (k1 + 1)) / (TF + k1 * length_norm)
 
 - Longer documents are penalized
 - Shorter documents are boosted
+
+### Semantic Search
+
+Semantic search looks for similar meaning or the intent of the query rather then trying to match the sub-string or tokens
+
+[Embeddings](https://www.cloudflare.com/en-in/learning/ai/what-are-embeddings/): are numerical representations of text that capture the meaning of words.
+
+For semantic search we will use embeddings as [vectors](<https://en.wikipedia.org/wiki/Vector_(mathematics_and_physics)>). Vectors are a list of numbers that represent two things. First it is numerical representation of text, after all it is a embedding. Second, it represent a point in space, specifically, a direction and a magnitude from the origin `(0,0)`
+
+We use vector as now the distance between the vectors represents how similar the meaning of the words are.
+
+The process of converting text to vector is essentially a machine learning problem where a lot of data is used and a lot of computations are performed on the data to learn patterns about how different words and phrases relate to each other.

@@ -1,9 +1,22 @@
 out
 *.db
 .env
+.env.*
 snip
 assets/
 samples/
 data/
 tmp/
 cache/
+
+# --- Python cache and virtual env ---
+cli/.venv/
+cli/__pycache__/
+cli/**/*.pyc
+cli/.python-version
+
+# Byte-compiled / optimized / DLL files
+*.py[cod]
+*$py.class
+
+*.log
