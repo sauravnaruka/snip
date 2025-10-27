@@ -20,6 +20,15 @@ class SemanticSearch:
         print(f"Model loaded: {self.model}")
         print(f"Max sequence length: {self.model.max_seq_length}")
 
+    def generate_embedding(self, text):
+        """
+        Generate an embedding for the given text using the model.
+        """
+        if not text or not text.strip():
+            raise ValueError("cannot generate embedding for empty text")
+        
+        return self.model.encode([text])[0]
+
 def verify_model():
     """
     Verify that the semantic search model loads correctly and print its information.
@@ -27,3 +36,15 @@ def verify_model():
     search = SemanticSearch()
     print(f"Model loaded: {search.model}")
     print(f"Max sequence length: {search.model.max_seq_length}")
+
+
+def embed_text(text):
+    """
+    Create a SemanticSearch instance, generate an embedding, and print it.
+    """
+    search = SemanticSearch()
+    embedding = search.generate_embedding(text)
+    
+    print(f"Text: {text}")
+    print(f"First 3 dimensions: {embedding[:3]}")
+    print(f"Dimensions: {embedding.shape[0]}")

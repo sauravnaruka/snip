@@ -410,6 +410,6 @@ In summary it works in two steps:
 
 ###### Why Cosine Similarity
 
-We want to use the same metric for similarity comparison as used by the model during the training process. The model we using is all-MiniLM-L6-v2 which used cosine similarity during training.
+We want to use the same metric for similarity comparison as used by the model during the training process. The model we using is `all-MiniLM-L6-v2` which used cosine similarity during training.
 
 Another great news is that cosine similarity is used by most embedding models
