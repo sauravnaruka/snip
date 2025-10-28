@@ -426,3 +426,38 @@ model = SentenceTransformer('sentence-transformers/all-MiniLM-L6-v2')
 
 embeddings = model.encode(sentences)
 ```
+
+#### Locality-Sensitive Hashing
+
+Checking a query against all the avialble data makes the query slow. A technique called Locality Sensitive Hashing (LSH), can speed up the search however the accurance can be reduced.
+
+In Locality Sensitive Hashing (LSH) we pre-group the similar vectors into buckets. When user query, we search only in specific buckets, thus speeding up the search. However, any relevant vector /search item is in different bucket then we will miss out the item in search result.
+
+It's a trade off between speed and accuracy (in ML terms you get lower recall). It should be used only when computation speed is a priority over perfect accuracy.
+
+#### Vector Databases
+
+We use a vector database instead of storing embeddings in arrays or the file system because it provides several important advantages.
+
+First, it enables sub-linear time similarity search through efficient vector indexing, making lookups much faster than brute-force comparisons.
+
+Second, it offers persistent and scalable storage, allowing us to store large volumes of embeddings—far beyond the capacity of a single machine.
+
+Third, it supports concurrent access, which is essential in production environments where multiple users or services may query the system simultaneously.
+
+Vector database is inheritely different from traditional database. Where traditional database uses row/columns to store data, vector databases uses High-dimensional vectors to store data.
+
+##### Indexing in Vector Databases
+
+Vector databases also use specialized indexing techniques to speed up similarity searches, such as:
+
+- HNSW: [Hierarchical navigable small world](https://en.wikipedia.org/wiki/Hierarchical_navigable_small_world)
+- IVF: [Inverted File Flat Vector](https://docs.oracle.com/en/database/oracle/oracle-database/26/vecse/understand-inverted-file-flat-vector-indexes.html)
+- LSH: [Locality-sensitive hashing](https://en.wikipedia.org/wiki/Locality-sensitive_hashing)
+
+##### Popular Vector Databases
+
+- PGVector: Open-source vector similarity search for PostgreSQL
+- sqlite-vec: Open-source vector similarity search for SQLite
+- LanceDB: Local-first, simple setup, small–medium scale
+- Weaviate: Full-featured, GraphQL API, complex schema
