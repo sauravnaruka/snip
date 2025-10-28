@@ -413,3 +413,16 @@ In summary it works in two steps:
 We want to use the same metric for similarity comparison as used by the model during the training process. The model we using is `all-MiniLM-L6-v2` which used cosine similarity during training.
 
 Another great news is that cosine similarity is used by most embedding models
+
+#### Creating Embeddings in Python
+
+We can create embeddings by using a module and [SentenceTransformer](https://sbert.net/#). We using [sentence-transformers/all-MiniLM-L6-v2](https://huggingface.co/sentence-transformers/all-MiniLM-L6-v2) in the project.
+
+We can load modal like this
+
+```py
+from sentence_transformers import SentenceTransformer
+model = SentenceTransformer('sentence-transformers/all-MiniLM-L6-v2')
+
+embeddings = model.encode(sentences)
+```

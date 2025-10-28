@@ -73,11 +73,15 @@ name = "cli"
 version = "0.1.0"
 source = { virtual = "." }
 dependencies = [
+    { name = "numpy" },
     { name = "sentence-transformers" },
 ]
 
 [package.metadata]
-requires-dist = [{ name = "sentence-transformers", specifier = ">=5.1.2" }]
+requires-dist = [
+    { name = "numpy", specifier = ">=2.3.4" },
+    { name = "sentence-transformers", specifier = ">=5.1.2" },
+]
 
 [[package]]
 name = "colorama"
