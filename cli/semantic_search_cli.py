@@ -3,11 +3,13 @@
 import argparse
 
 from lib.semantic_search import (
+    DEFAULT_CHUNK_SIZE,
+    DEFAULT_CHUNK_OVERLAP,
     verify_model,embed_text, 
     verify_embeddings, 
     embed_query_text, 
     semantic_search, 
-    chunk_text
+    chunk_text,
 )
 
 def main() -> None:
@@ -34,7 +36,8 @@ def main() -> None:
     # Command: chunk
     chunk_parser = subparsers.add_parser("chunk", help="add fixed size chunking to split long text into smaller pieces for embedding")
     chunk_parser.add_argument("text", type=str, help="Input text to create chunk")
-    chunk_parser.add_argument("--chunk-size", type=int, default=200, help="Define the size of the chunk")
+    chunk_parser.add_argument("--chunk-size", type=int, default=DEFAULT_CHUNK_SIZE, help="Define the size of the chunk")
+    chunk_parser.add_argument("--overlap", type=int, default=DEFAULT_CHUNK_OVERLAP, help="Define the overlap for the chunk")
 
     args = parser.parse_args()
 
@@ -50,7 +53,7 @@ def main() -> None:
         case "search":
             semantic_search(args.query, args.limit)
         case "chunk":
-            chunk_text(args.text, args.chunk_size)
+            chunk_text(args.text, args.chunk_size, args.overlap)
         case _:
             parser.print_help()
 

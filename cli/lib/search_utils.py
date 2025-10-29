@@ -7,6 +7,7 @@ CACHE_DIR = os.path.join(PROJECT_ROOT, "cache")
 MOVIE_EMBEDDINGS_PATH = os.path.join(CACHE_DIR, "movie_embeddings.npy")
 
 DEFAULT_CHUNK_SIZE = 200
+DEFAULT_CHUNK_OVERLAP = 0
 
 def load_movies() -> list[dict]:
     with open(DATA_PATH, "r") as f:

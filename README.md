@@ -461,3 +461,29 @@ Vector databases also use specialized indexing techniques to speed up similarity
 - sqlite-vec: Open-source vector similarity search for SQLite
 - LanceDB: Local-first, simple setup, small–medium scale
 - Weaviate: Full-featured, GraphQL API, complex schema
+
+#### Chunking
+
+f we create an embedding for a short paragraph, it works well. However, when we try to embed a long paragraph into a single embedding, several issues arise:
+
+- Semantic dilution: Combining multiple topics into one embedding causes the overall meaning to become less precise.
+- Token limit: The model can only process a limited number of tokens.
+- Reduced precision: Specific concepts tend to get "averaged out," weakening their distinct representation.
+- Irrelevant matches: Certain parts of the long text may lead to poor or unrelated search matches.
+
+Chunking solve this problem by splitting long documents into smaller pieces.
+
+##### Fixed-Size Chunking
+
+The simplest chunking approach is to split the text into fixed-size pieces based on character count or word count.
+
+- Predictable size: All chunks are roughly the same length
+- Simple implementation: Easy to understand and implement
+- Fast runtime performance: Fast chunking with minimal computation
+- Token control: Can ensure chunks fit model limits
+
+However, fixed-size chunking has one major drawback — a paragraph can be split at arbitrary points, leading to a loss of context.
+
+To address this, we use a technique called chunk overlap, where consecutive chunks share a portion of text to maintain continuity.
+
+The optimal overlap size depends on the nature of the data and should be verified experimentally, but a 20% overlap is a good starting point.
