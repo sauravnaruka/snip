@@ -1,28 +1,40 @@
 #!/usr/bin/env python3
 
 import argparse
-from lib.semantic_search import verify_model,embed_text, verify_embeddings, embed_query_text, search_movie
 
-def main():
+from lib.semantic_search import (
+    verify_model,embed_text, 
+    verify_embeddings, 
+    embed_query_text, 
+    semantic_search, 
+    chunk_text
+)
+
+def main() -> None:
     parser = argparse.ArgumentParser(description="Semantic Search CLI")
     subparsers = parser.add_subparsers(dest="command", help="Available commands")
 
     # Command: verify
-    subparsers.add_parser("verify", help="Verify the semantic search model loads correctly")
+    subparsers.add_parser("verify", help="Verify that the embedding model is loaded")
 
     # Command: embed_text <text>
-    embed_parser = subparsers.add_parser("embed_text", help="Generate embedding for given text")
-    embed_parser.add_argument("text", type=str, help="Input text to generate embedding for")
+    single_embed_parser = subparsers.add_parser("embed_text", help="Generate embedding for given text")
+    single_embed_parser.add_argument("text", type=str, help="Text to embed")
 
     subparsers.add_parser("verify_embeddings", help="Generate embeddings for the entire movie dataset; to save them to disk")
     
-    embed_query = subparsers.add_parser("embedquery", help="Generate embeddings for the user query.")
-    embed_query.add_argument("text", type=str, help="Input text to generate embedding for")
+    embed_query_parser = subparsers.add_parser("embedquery", help="Generate embeddings for the user query.")
+    embed_query_parser.add_argument("query", type=str, help="Query to embed")
 
     # Command: search
-    search_query = subparsers.add_parser("search", help="Search movie database to get similar movies")
-    search_query.add_argument("query", type=str, help="Input text to search movie for")
-    search_query.add_argument("--limit", type=int, default=5, help="Limit the number of search results (default: 5)")
+    search_parser = subparsers.add_parser("search", help="Search movie database to get similar movies")
+    search_parser.add_argument("query", type=str, help="Input text to search movie for")
+    search_parser.add_argument("--limit", type=int, default=5, help="Limit the number of search results (default: 5)")
+
+    # Command: chunk
+    chunk_parser = subparsers.add_parser("chunk", help="add fixed size chunking to split long text into smaller pieces for embedding")
+    chunk_parser.add_argument("text", type=str, help="Input text to create chunk")
+    chunk_parser.add_argument("--chunk-size", type=int, default=200, help="Define the size of the chunk")
 
     args = parser.parse_args()
 
@@ -34,9 +46,11 @@ def main():
         case "verify_embeddings":
             verify_embeddings()
         case "embedquery":
-            embed_query_text(args.text)
+            embed_query_text(args.query)
         case "search":
-            search_movie(args.query, args.limit)
+            semantic_search(args.query, args.limit)
+        case "chunk":
+            chunk_text(args.text, args.chunk_size)
         case _:
             parser.print_help()
 

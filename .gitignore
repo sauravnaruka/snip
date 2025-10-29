@@ -2,6 +2,7 @@ out
 *.db
 .env
 .env.*
+*.log
 snip
 assets/
 samples/
@@ -14,9 +15,8 @@ cli/.venv/
 cli/__pycache__/
 cli/**/*.pyc
 cli/.python-version
+uv.lock
 
 # Byte-compiled / optimized / DLL files
 *.py[cod]
 *$py.class
-
-*.log
