@@ -487,3 +487,30 @@ However, fixed-size chunking has one major drawback — a paragraph can be split
 To address this, we use a technique called chunk overlap, where consecutive chunks share a portion of text to maintain continuity.
 
 The optimal overlap size depends on the nature of the data and should be verified experimentally, but a 20% overlap is a good starting point.
+
+##### Semantic Chunking
+
+In semantic chunking we try to break text according to natural language breaks like sentance or paragraph. Each chunk will contain complete throught. We can still use overlap to increase context.
+
+So in a typical flow of large text or document we want to:
+
+1. Chunk document text based on semantic or natural language breaks. This can be done using a regex like `r"(?<=[.!?])\s+"`
+2. Each chunk is passed to model to create an embedding for the chunk
+3. Create a relationship between embedding and parent document
+4. Search user query by first converting it into a embedding from same model and then query each embedding individually
+
+##### ColBERT
+
+[ColBERT](https://arxiv.org/abs/2004.12832) creates one embedding per word, with each word contextualized.
+
+ColBERT is an example of MVR (Multi-Vector Retrieval) where a document or chunk is represented by multiple vectors.
+
+It require more storage and computational power
+
+##### Late Chunking
+
+[Late Chunking](https://jina.ai/news/late-chunking-in-long-context-embedding-models/) creates a single embedding for the enttire document (or as much of it as possible), and then uses that embedding to create context-aware embeddings for each word.
+
+Now, each word contributes more meaningful information to the final embedding because its role in the text is already understood.
+
+Again, this is more complex and require more computational power like [ColBERT](#ColBERT). Most real world scenarios can be handled by regular chunking.
