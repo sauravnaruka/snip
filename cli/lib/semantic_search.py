@@ -2,6 +2,7 @@
 Semantic search module using sentence transformers for embedding-based search.
 """
 
+import re
 from sentence_transformers import SentenceTransformer
 import numpy as np
 import os
@@ -9,6 +10,8 @@ import os
 from .search_utils import (
     DEFAULT_CHUNK_SIZE,
     DEFAULT_CHUNK_OVERLAP,
+    DEFAULT_SEMANTIC_CHUNK_SIZE,
+    DEFAULT_SEMANTIC_CHUNK_OVERLAP,
     MOVIE_EMBEDDINGS_PATH,
     load_movies
 )
@@ -184,4 +187,30 @@ def fixed_size_chunking(text: str, chunk_size: int = DEFAULT_CHUNK_SIZE, overlap
         i += chunk_size - overlap
         print(f"i={i}")
 
+    return chunks
+
+
+def chunk_semantic_text(text: str, max_chunk_size: int, overlap: int) -> None:
+    print(f"Semantically chunking {len(text)} characters")
+    chunks = semantic_chunking(text, max_chunk_size, overlap)
+
+    for i, chunk in enumerate(chunks, start=1):
+        print(f"{i}. {chunk}")
+
+def semantic_chunking(text: str, max_chunk_size: int = DEFAULT_SEMANTIC_CHUNK_SIZE, overlap: int = DEFAULT_SEMANTIC_CHUNK_OVERLAP) -> list[str]:
+    # Split text into sentences
+    sentences = re.split(r"(?<=[.!?])\s+", text)
+    chunks = []
+    
+    i = 0
+    while i < len(sentences):
+        # Get up to max_chunk_size sentences
+        chunk_sentences = sentences[i : i + max_chunk_size]
+        chunks.append(" ".join(chunk_sentences))
+        # Move forward by (max_chunk_size - overlap)
+        i += max_chunk_size - overlap
+
+        if overlap > 0 and i + overlap >= len(sentences):
+            break
+    
     return chunks
