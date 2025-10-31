@@ -11,7 +11,6 @@ from .search_utils import (
     DEFAULT_CHUNK_SIZE,
     DEFAULT_CHUNK_OVERLAP,
     DEFAULT_SEMANTIC_CHUNK_SIZE,
-    DEFAULT_SEMANTIC_CHUNK_OVERLAP,
     MOVIE_EMBEDDINGS_PATH,
     load_movies
 )
@@ -197,7 +196,7 @@ def chunk_semantic_text(text: str, max_chunk_size: int, overlap: int) -> None:
     for i, chunk in enumerate(chunks, start=1):
         print(f"{i}. {chunk}")
 
-def semantic_chunking(text: str, max_chunk_size: int = DEFAULT_SEMANTIC_CHUNK_SIZE, overlap: int = DEFAULT_SEMANTIC_CHUNK_OVERLAP) -> list[str]:
+def semantic_chunking(text: str, max_chunk_size: int = DEFAULT_SEMANTIC_CHUNK_SIZE, overlap: int = DEFAULT_CHUNK_OVERLAP) -> list[str]:
     # Split text into sentences
     sentences = re.split(r"(?<=[.!?])\s+", text)
     chunks = []
