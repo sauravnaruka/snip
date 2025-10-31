@@ -138,7 +138,6 @@ def embed_chunks():
 
 def search_chunked(query, limit):
     documents = load_movies()
-
     chunk_semantic_search = ChunkedSemanticSearch()
     chunk_semantic_search.load_or_create_chunk_embeddings(documents)
 
