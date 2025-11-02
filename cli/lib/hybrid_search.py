@@ -43,7 +43,7 @@ class HybridSearch:
         bm25_results = self._bm25_search(query, limit * 500)
         semantic_results = self.semantic_search.search_chunks(query, limit * 500)
 
-        combined = combine_search_results_rrf(bm25_results, semantic_results, k)
+        combined = reciprocal_rank_fusion(bm25_results, semantic_results, k)
         return combined[:limit]
         
 def combine_search_results(
@@ -146,7 +146,7 @@ def weighted_search_command(query, alpha, limit):
         "results": results,
     }
 
-def combine_search_results_rrf(
+def reciprocal_rank_fusion(
     bm25_results: list[dict], semantic_results: list[dict], k: float = DEFAULT_ALPHA
 ) -> list[dict]:
     combined_scores = {}
@@ -158,8 +158,8 @@ def combine_search_results_rrf(
             combined_scores[doc_id] = {
                 "title": result["title"],
                 "document": result["document"],
-                "bm25_rank": 0,
-                "semantic_rank": 0,
+                "bm25_rank": None,
+                "semantic_rank": None,
                 "score": 0,
             }
         combined_scores[doc_id]["bm25_rank"] = i 

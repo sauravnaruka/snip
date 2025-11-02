@@ -514,3 +514,97 @@ It require more storage and computational power
 Now, each word contributes more meaningful information to the final embedding because its role in the text is already understood.
 
 Again, this is more complex and require more computational power like [ColBERT](#ColBERT). Most real world scenarios can be handled by regular chunking.
+
+### Hybrid Search
+
+There are two different types of search
+
+1. [Keyword Search](#keyword-search)
+2. [Semantic Search](#semantic-search)
+
+Both searches have thier own strength. For example when some one searching for exact query or exact year or exact time then [Keyword Search](#keyword-search) will perform better. However, if someone searching for a theme or concept then [Semantic Search](#semantic-search).
+
+So which one to use. We probably need to use both search and combine their result to give user more accurate results.
+
+Their are two major ways by which we can combine the result of both the searches. They are:
+
+1. Weighted Combination
+2. Reciprocal Rank Fusion
+
+#### Weighted Combination
+
+We cannot combine the score of keyword and semantic search because both the scores are on different scales alltogether.
+
+- Keyword search is on `0-100+`
+- Scmantic search is on cosine score `0-1`
+
+There are two steps to combine the score:
+
+1. Normalize both, Keyword search & Semantic search scores
+2. Combine with weighted score
+
+##### Min-Max Normaliztion
+
+The simplest way to normalize the two score is using Min-Max normalization.
+Following is the formula:
+
+```
+normalized_score = (score - min_score) / (max_score - min_score)
+```
+
+for example for the input `[23.2, 8.7, 2.1]`,
+
+- `min_score = 2.1` and
+- `max_score = 23.2`
+
+Putting on formula:
+
+```
+(23.2 - 2.1) / (23.2 - 2.1) = 1
+(8.7 - 2.1) / (23.2 - 2.1) = .313
+(2.1 - 2.1) / (23.2 - 2.1) = 0.00
+```
+
+Similarly for semantic score `[.623, .453, .231]`
+
+- `min_score = .231` &
+- `max_score = .623`
+
+```
+(.623 - .231) / (.623 - .231) = 1
+(.453 - .231) / (.623 - .231) = .566
+(.231 - .231) / (.623 - .231) = 0.00
+```
+
+##### Combination
+
+Formula
+
+```
+score = (alpha * keyword_score) + ((1-alpha) * semantic_score)
+```
+
+Alpha is just a constant that we can use to dynamically control the weighting between the two scores
+
+Alpha range between `0-1`.
+
+- When `alpha=1`, 100% weighting to keyword score
+- When `alpha=0`, 100% weighting to semantic score
+- When `alpha=0.5`, equal weighting to both
+
+#### Reciprocal Rank Fussion
+
+The issue with [Min-Max Normalization](#min-max-normaliztion) is that it does not work well with major outlier or both search result has different kinds of distributions.
+
+The other way is to use Reciprocal Rank Fussion. In RRF, we completely skip scores of semantic and keyword search and only consider thier ranks.
+
+```
+score = 1 / (k + rank)
+```
+
+Where `k` is a constant to controls how distribution of score between higher ranked vs lower ranked once get effected. Example:
+
+- Lower `k` values like `20` gives more weight to top ranked results, creating a steep drop-off in scores
+- Higher `k` values like `100` creates a more gradual decline.
+
+A good default for k is `60`
