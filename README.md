@@ -608,3 +608,14 @@ Where `k` is a constant to controls how distribution of score between higher ran
 - Higher `k` values like `100` creates a more gradual decline.
 
 A good default for k is `60`
+
+### LLM in Search
+
+User enter query which is not formated or has typos or it is just a framgment of thought. We can use LLM to user enhance query before we perform hybrid search.
+
+Using LLM we can do following with query:
+
+- Fixes typos
+- Expands meaning
+- Breaks apart complex queries
+- Add missing context
