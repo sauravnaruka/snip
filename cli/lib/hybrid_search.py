@@ -1,6 +1,8 @@
 import os
+import time
 from typing import Optional
 
+from .reranking import rerank
 from .keyword_search import InvertedIndex
 from .chunked_semantic_search import (
     ChunkedSemanticSearch,
@@ -10,10 +12,12 @@ from .search_utils import (
     DEFAULT_SEARCH_LIMIT,
     DEFAULT_ALPHA,
     DEFAULT_RRF_K,
+    SEARCH_MULTIPLIER,
     format_search_result
 )
-
-from .query_enhancement import enhance_query
+from .query_enhancement import (
+    enhance_query
+)
 
 class HybridSearch:
     def __init__(self, documents):
@@ -204,6 +208,7 @@ def rrf_search_command(
     query: str,
     k: int = DEFAULT_RRF_K,
     enhance: Optional[str] = None,
+    rerank_method: Optional[str] = None,
     limit: int = DEFAULT_SEARCH_LIMIT,
 ) -> dict:
     movies = load_movies()
@@ -215,13 +220,20 @@ def rrf_search_command(
         enhanced_query = enhance_query(query, method=enhance)
         query = enhanced_query
     
-    search_limit = limit
-    results = hybrid_search.rrf_search(query, k, limit)
+    search_limit = limit * SEARCH_MULTIPLIER if rerank_method else limit
+    results = hybrid_search.rrf_search(query, k, search_limit)
 
+    reranked = False
+    if rerank_method:
+        results = rerank(query, results, method=rerank_method, limit=limit)
+        reranked = True 
+    
     return {
         "original_query": original_query,
         "enhanced_query": enhanced_query,
         "enhance_method": enhance,
+        "rerank_method": rerank_method,
+        "reranked": reranked,
         "query": query,
         "k": k,
         "results": results,
