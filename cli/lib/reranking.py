@@ -1,4 +1,6 @@
+import json
 import os
+import re
 from time import sleep
 
 from dotenv import load_dotenv
@@ -8,6 +10,17 @@ load_dotenv()
 api_key = os.getenv("GEMINI_API_KEY")
 client = genai.Client(api_key=api_key)
 model = "gemini-2.0-flash"
+
+def rerank(
+    query: str, documents: list[dict], method: str = "batch", limit: int = 5
+) -> list[dict]:
+    match method:
+        case "individual":
+            return llm_rerank_individual(query, documents, limit)
+        case "batch":
+            return llm_rerank_batch(query, documents, limit)
+        case _:
+            return documents[:limit]
 
 
 def llm_rerank_individual(
@@ -41,10 +54,43 @@ Score:"""
     return scored_docs[:limit]
 
 
-def rerank(
-    query: str, documents: list[dict], method: str = "batch", limit: int = 5
-) -> list[dict]:
-    if method == "individual":
-        return llm_rerank_individual(query, documents, limit)
-    else:
-        return documents[:limit]
+
+def llm_rerank_batch(query: str, documents: list[dict], limit: int = 5):
+    if not documents:
+        return []
+
+    doc_list_str = "\n".join(
+        f"{doc['id']}: {doc['title']} - {doc['document']}"
+        for doc in documents
+    )
+
+    prompt = f"""Rank these movies by relevance to the search query.
+
+Query: "{query}"
+
+Movies:
+{doc_list_str}
+
+Return ONLY the IDs in order of relevance (best match first). Return a valid JSON list, nothing else. For example:
+
+[75, 12, 34, 2, 1]
+"""
+    response = client.models.generate_content(model=model, contents=prompt)
+    print(f"LLM response.text: {response.text}")
+
+    text = response.candidates[0].content.parts[0].text.strip()
+
+    print(f"LLM text: {text}")
+    try:
+        result_ids = json.loads(text)
+    except json.JSONDecodeError:
+        print("Warning: JSON decoding failed, attempting regex fallback")
+        result_ids = [int(x) for x in re.findall(r"\d+", text)]
+    print(f"Parsed result IDs: {result_ids}")
+    result = []
+    for doc_id in result_ids:
+        doc = next((d for d in documents if d["id"] == doc_id), None)
+        if doc:
+            result.append(doc)
+    
+    return result[:limit]
