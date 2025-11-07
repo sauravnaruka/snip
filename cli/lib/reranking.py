@@ -1,8 +1,9 @@
 import json
 import os
 import re
-from time import sleep
 
+from time import sleep
+from sentence_transformers import CrossEncoder
 from dotenv import load_dotenv
 from google import genai
 
@@ -19,6 +20,8 @@ def rerank(
             return llm_rerank_individual(query, documents, limit)
         case "batch":
             return llm_rerank_batch(query, documents, limit)
+        case "cross_encoder":
+            return cross_encoder_rank(query, documents, limit)
         case _:
             return documents[:limit]
 
@@ -59,11 +62,17 @@ def llm_rerank_batch(query: str, documents: list[dict], limit: int = 5):
     if not documents:
         return []
 
-    doc_list_str = "\n".join(
-        f"{doc['id']}: {doc['title']} - {doc['document']}"
-        for doc in documents
-    )
+    doc_map = {}
+    doc_list = []
+    for doc in documents:
+        doc_id = doc["id"]
+        doc_map[doc_id] = doc
+        doc_list.append(
+            f"{doc_id}: {doc.get('title', '')} - {doc.get('document', '')[:200]}"
+        )
 
+    doc_list_str = "\n".join(doc_list)
+    
     prompt = f"""Rank these movies by relevance to the search query.
 
 Query: "{query}"
@@ -76,21 +85,31 @@ Return ONLY the IDs in order of relevance (best match first). Return a valid JSO
 [75, 12, 34, 2, 1]
 """
     response = client.models.generate_content(model=model, contents=prompt)
-    print(f"LLM response.text: {response.text}")
+    ranking_text = (response.text or "").strip()
 
-    text = response.candidates[0].content.parts[0].text.strip()
+    parsed_ids = json.loads(ranking_text)
 
-    print(f"LLM text: {text}")
-    try:
-        result_ids = json.loads(text)
-    except json.JSONDecodeError:
-        print("Warning: JSON decoding failed, attempting regex fallback")
-        result_ids = [int(x) for x in re.findall(r"\d+", text)]
-    print(f"Parsed result IDs: {result_ids}")
-    result = []
-    for doc_id in result_ids:
-        doc = next((d for d in documents if d["id"] == doc_id), None)
-        if doc:
-            result.append(doc)
+
+    reranked = []
+    for i, doc_id in enumerate(parsed_ids):
+        if doc_id in doc_map:
+            reranked.append({**doc_map[doc_id], "batch_rank": i + 1})
+
     
-    return result[:limit]
+    return reranked[:limit]
+
+def cross_encoder_rank(query: str, documents: list[dict], limit: int = 5):
+    pairs = []
+    for doc in documents:
+        pairs.append([query, f"{doc.get('title', '')} - {doc.get('document', '')}"])
+
+    cross_encoder = CrossEncoder("cross-encoder/ms-marco-TinyBERT-L2-v2")
+
+    scores = cross_encoder.predict(pairs).tolist()
+
+    for doc, score in zip(documents, scores):
+        doc["cross_encoder_score"] = float(score)
+
+    sorted_docs = sorted(documents, key=lambda x: x["cross_encoder_score"], reverse=True)
+
+    return sorted_docs[:limit]

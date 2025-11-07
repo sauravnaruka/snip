@@ -611,6 +611,8 @@ A good default for k is `60`
 
 ### LLM in Search
 
+#### LLM for improving query
+
 User enter query which is not formated or has typos or it is just a framgment of thought. We can use LLM to user enhance query before we perform hybrid search.
 
 Using LLM we can do following with query:
@@ -619,3 +621,12 @@ Using LLM we can do following with query:
 - Expands meaning
 - Breaks apart complex queries
 - Add missing context
+
+#### LLM for Reranking query
+
+To be extremly good at search, we go through 3 stages of searching
+
+1. [Hybrid Search](#hybrid-search)
+   1.1 [Keyword Search](#keyword-search)
+   1.2 [Semantic Search](#semantic-search)
+   1.3 Combine result using [Reciprocal Rank Fussion](#reciprocal-rank-fussion) or [Weighted Combination](#weighted-combination)
