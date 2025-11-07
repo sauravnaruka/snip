@@ -626,7 +626,27 @@ Using LLM we can do following with query:
 
 To be extremly good at search, we go through 3 stages of searching
 
-1. [Hybrid Search](#hybrid-search)
+1. Stage 1: Fast BM25/Cosine similarity to find top 25 results like using [Hybrid Search](#hybrid-search)
    1.1 [Keyword Search](#keyword-search)
    1.2 [Semantic Search](#semantic-search)
    1.3 Combine result using [Reciprocal Rank Fussion](#reciprocal-rank-fussion) or [Weighted Combination](#weighted-combination)
+2. Stage 2: Slow re-ranking to find the top 5 out of 25 results
+
+For reranking we using query and full document to rerank the results. It's more accurate but it's much slower.
+
+There are two main ways we can do Stage two:
+
+1. Use LLM to re-rank. We pass the top results from stage 1 in batch so that LLM can rank them relative to each other
+2. [Cross-Encoder Re-Ranking](https://sbert.net/examples/cross_encoder/applications/README.html):
+
+##### Cross-Encoder Re-Ranking
+
+Out semantic search embeddings were created with bi-encoder, which embeds queries and document seprarately.
+
+In cross-encoder, we embed the query and document together in a single input. Output is the score and we don't need to calculate cosine similarity as cross-encoders see the full context of how the query and document interact, so they can catch subtle relationships that bi-encoders miss.
+
+Advantage is that cross-encoder are much faster and cheaper than LLMs. Cross-encoder is a regression model. A regression model is a type of machine learning model that predicts a number / predict a continuous value — not a category or label.
+
+Second advantage of cross-encoder is that they can be fine-tuned on your specific domain relatively easily.
+
+Cohere API uses cross-encoders.
