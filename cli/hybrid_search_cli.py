@@ -71,8 +71,8 @@ def main() -> None:
                     print(f"   Rerank Score: {res.get('individual_score', 0):.3f}/10")
                 if "batch_rank" in res:
                     print(f"   Rerank Rank: {res.get('batch_rank', 0)}")
-                if "cross_encoder_score" in res:
-                    print(f"   Cross Encoder Score: {res.get('cross_encoder_score', 0)}")
+                if "crossencoder_score" in res:
+                    print(f"   Cross Encoder Score: {res.get('crossencoder_score', 0)}")
                
                 print(f"   RRF Score: {res.get('score', 0):.3f}")
 
