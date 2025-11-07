@@ -4,6 +4,7 @@ from typing import Any
 
 PROJECT_ROOT = os.path.dirname(os.path.dirname(os.path.dirname(__file__)))
 DATA_PATH = os.path.join(PROJECT_ROOT, "data", "movies.json")
+GOLDEN_DATASET_PATH = os.path.join(PROJECT_ROOT, "data", "golden_dataset.json")
 CACHE_DIR = os.path.join(PROJECT_ROOT, "cache")
 STOPWORDS_PATH = os.path.join(PROJECT_ROOT, "data", "stopwords.txt")
 MOVIE_EMBEDDINGS_PATH = os.path.join(CACHE_DIR, "movie_embeddings.npy")
@@ -28,6 +29,11 @@ def load_movies() -> list[dict]:
     with open(DATA_PATH, "r") as f:
         data = json.load(f)
     return data["movies"]
+
+def load_golden_dataset() -> list[dict]:
+    with open(GOLDEN_DATASET_PATH, "r") as f:
+        data = json.load(f)
+    return data["test_cases"]
 
 def load_stopwords() -> list[str]:
     with open(STOPWORDS_PATH, "r") as f:
