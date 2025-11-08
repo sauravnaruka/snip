@@ -197,6 +197,7 @@ def reciprocal_rank_fusion(
             semantic_rank=data["semantic_rank"],
         )
         rrf_results.append(result)
+        print(f"DEBUG: {data["title"]}: bm25_rank={data["bm25_rank"]}, semantic_rank={data["semantic_rank"]}")
 
     return sorted(rrf_results, key=lambda x: x["score"], reverse=True)
 
@@ -214,10 +215,12 @@ def rrf_search_command(
     movies = load_movies()
     hybrid_search = HybridSearch(movies)
 
+    print(f"DEBUG: Original query: {query}")
     original_query = query
     enhanced_query = None
     if enhance:
         enhanced_query = enhance_query(query, method=enhance)
+        print(f"DEBUG: Enhanced query: {enhanced_query}")
         query = enhanced_query
     
     search_limit = limit * SEARCH_MULTIPLIER if rerank_method else limit

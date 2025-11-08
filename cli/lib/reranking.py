@@ -108,6 +108,7 @@ def cross_encoder_rank(query: str, documents: list[dict], limit: int = 5)-> list
 
     for doc, score in zip(documents, scores):
         doc["crossencoder_score"] = float(score)
+        print(f"DEBUG: Title = {doc['title']} , crossencoder_score={doc["crossencoder_score"]}")
 
     documents.sort(key=lambda x: x["crossencoder_score"], reverse=True)
     return documents[:limit]

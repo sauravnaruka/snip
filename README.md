@@ -650,3 +650,91 @@ Advantage is that cross-encoder are much faster and cheaper than LLMs. Cross-enc
 Second advantage of cross-encoder is that they can be fine-tuned on your specific domain relatively easily.
 
 Cohere API uses cross-encoders.
+
+### Evaluation
+
+#### Manual Evaluation
+
+Ask following question
+
+- What's here that shouldn't be?
+- What's not here that should be?
+- Would I click on these results?
+- Did the result give you enough information to know whether the movies are relevant?
+- Would it be better to return fewer results because the last few usually aren't relevant?
+- Would it be better to return more results because there are more highly relevant queries?
+
+#### Automatic Evaluation
+
+To evaluate result you need a curated dataset, also called "Golden Dataset". Usually created with the help of domain expert. It's like your test data for your test cases.
+
+Ideally it should contain
+
+- `query`: Actual user query
+- Expected result
+
+##### Precision Metrics
+
+One of the metric which we check with evaluation is precision metrics. We try to anser the question
+
+**Among the results I recived, How many are revelvant?**
+Formula:
+
+```
+precision = relevant_retrieved / total_retrieved
+```
+
+- Higher precision = less junk in the results.
+
+[Precision@K or P@K](<https://en.wikipedia.org/wiki/Evaluation_measures_(information_retrieval)#Precision_at_k>) is a common metric that measure precision of top k results
+
+##### Recall Metrics
+
+Recall measures the completeness of result. It's like asking, **did we get all the results which we expect to get?**
+
+```
+recall = relevant_retrieved / total_relevant
+```
+
+Recall is critical, it defines the user experience. User experience decresase if they don't find what they expect to find.
+
+Also, in critical applications like medical or legal discovery & safety systems need high recall as missing information is critical.
+
+Some times [Precision Metrics](#precision-metrics) & recall can not be optimized together. In that case one need to do tradeoff.
+
+##### F1 Score
+
+[F1 Score](https://en.wikipedia.org/wiki/F-score) is a single metric that combine [percision](#precision-metrics) & [recall](#recall-metrics).
+
+Formula:
+
+```
+f1 = 2 * (precision * recall) / (precision + recall)x
+```
+
+F1 score is the [harmonic mean](https://en.wikipedia.org/wiki/Harmonic_mean) of precision and recall. It gives you one number that represents the overall performance of your search system.
+
+Harmonic mean is better than a regular mean because it punishes extreme disparities more. F1 is better when:
+
+- Precision and recall are equally important
+- You want a single metric to optimize
+- You're comparing different systems
+
+#### LLM Evaluation
+
+Manual evaluation is slow. Automated metrics miss nuance. So we can add LLM based evalution.
+
+LLM is not a domain export but with the help of domain expert we can define what success look like. We need to
+
+- define clear evaluation criteria
+- Specify what makes a result relevant
+- Artivulate your quality standards
+
+LLM might not be as good as human domain expert but still better then developer who might not have the domain knowledge. Another advantage is that we can implement LLM for scale and speed.
+
+**Implementation Strategy**
+Start with experts – Define clear evaluation criteria
+Create detailed prompts – Include domain knowledge
+Validate on samples – Check LLM agrees with experts
+Use for scale – Let LLM handle bulk evaluation
+Spot-check results – Have experts review surprising scores

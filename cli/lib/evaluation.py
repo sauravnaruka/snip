@@ -1,9 +1,14 @@
+import json
 from .hybrid_search import HybridSearch
 from .search_utils import (
     load_golden_dataset,
     load_movies,
 )
 from .semantic_search import SemanticSearch
+from .reranking import (
+    client,
+    model
+)
 
 def precision_at_k(
     retrieved_docs: list[str], relevant_docs: set[str], k: int = 5
@@ -73,3 +78,36 @@ def evaluate_command(limit: int = 5) -> dict:
         "limit": limit,
         "results": results_by_query,
     }
+
+
+def llm_judge_results(query: str, results: list[dict]):
+    movie_titles = []
+    for res in results:
+        movie_titles.append(res["title"])
+
+    prompt = f"""Rate how relevant each result is to this query on a 0-3 scale:
+
+Query: "{query}"
+
+Results:
+{chr(10).join(movie_titles)}
+
+Scale:
+- 3: Highly relevant
+- 2: Relevant
+- 1: Marginally relevant
+- 0: Not relevant
+
+Do NOT give any numbers out than 0, 1, 2, or 3.
+
+Return ONLY the scores in the same order you were given the documents. Return a valid JSON list, nothing else. For example:
+
+[2, 0, 3, 2, 0, 1]"""
+    
+    response = client.models.generate_content(model=model, contents=prompt)
+    ranking_text = (response.text or "").strip()
+
+    parsed_scores = json.loads(ranking_text)
+
+    for i, (title, score) in enumerate(zip(movie_titles, parsed_scores), start=1):
+        print(f"{i}. {title}: {score}/3")

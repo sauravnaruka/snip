@@ -12,6 +12,10 @@ from lib.search_utils import (
     DEFAULT_RRF_K
 )
 
+from lib.evaluation import (
+    llm_judge_results
+)
+
 def main() -> None:
     parser = argparse.ArgumentParser(description="Hybrid Search CLI")
     subparsers = parser.add_subparsers(dest="command", help="Available commands")
@@ -33,6 +37,7 @@ def main() -> None:
     rrf_search_parser.add_argument("--limit", type=int, default=DEFAULT_SEARCH_LIMIT, help="the number of search results to filter out")
     rrf_search_parser.add_argument("--enhance", type=str, choices=["spell", "rewrite", "expand"], help="Query enhancement method")
     rrf_search_parser.add_argument("--rerank-method", type=str, choices=["individual", "batch", "cross_encoder"], help="search result re-ranking method")
+    rrf_search_parser.add_argument("--evaluate", action="store_true", help="rates the search results")
 
     args = parser.parse_args()
 
@@ -87,6 +92,9 @@ def main() -> None:
 
                 print(f"   {res['document'][:100]}...")
                 print()
+
+            if args.evaluate:
+                llm_judge_results(args.query, result["results"])
         case _:
             parser.print_help()
 
