@@ -738,3 +738,13 @@ Create detailed prompts – Include domain knowledge
 Validate on samples – Check LLM agrees with experts
 Use for scale – Let LLM handle bulk evaluation
 Spot-check results – Have experts review surprising scores
+
+## Augmented Generation
+
+RAG stands for [Retrieval-Augmented Generation](https://en.wikipedia.org/wiki/Retrieval-augmented_generation).
+
+1. **Retrieval**: [Search](#search) is Retrieval part.
+2. **Augmented**: We send the search result to LLM as part of the context. That is we augmenting the LLM information with information we have, the search result.
+3. **Generate**: LLM generate response with the information agumentation
+
+Sometimes search results disagree. Like user review or feedback. One way to get more balanced response is by building a step in RAG pipeline which simply identifies any conflicts before summarizeing
