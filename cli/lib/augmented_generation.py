@@ -154,3 +154,48 @@ Answer:"""
     
     response = client.models.generate_content(model=model, contents=prompt)
     return (response.text or "").strip()
+
+
+def question_command(query, limit):
+    movies = load_movies()
+    hybrid_search = HybridSearch(movies)
+
+    search_results = hybrid_search.rrf_search(
+        query, k=DEFAULT_RRF_K, limit=limit * SEARCH_MULTIPLIER
+    )
+
+    if not search_results:
+        return {"query": query, "error": "No results found"}
+
+    answer = answer_question(search_results, query, limit)
+
+    return {
+        "query": query,
+        "answer": answer,
+        "search_results": search_results[:limit],
+    }
+
+def answer_question(search_results, query, limit):
+    docs_text = ""
+    for i, result in enumerate(search_results[:limit], start=1):
+        docs_text += f"Document {i}: {result['title']}; {result['document']}\n\n"
+
+    prompt = f"""Answer the user's question based on the provided movies that are available on Snip.
+
+This should be tailored to Snip users. Snip is a movie streaming service.
+
+Question: {query}
+
+Documents:
+{docs_text}
+
+Instructions:
+- Answer questions directly and concisely
+- Be casual and conversational
+- Don't be cringe or hype-y
+- Talk like a normal person would in a chat conversation
+
+Answer:"""
+    
+    response = client.models.generate_content(model=model, contents=prompt)
+    return (response.text or "").strip()

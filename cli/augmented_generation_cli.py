@@ -1,7 +1,7 @@
 import argparse
 
 from lib.search_utils import DEFAULT_SEARCH_LIMIT
-from lib.augmented_generation import citation_command, rag_command, summarize_command
+from lib.augmented_generation import citation_command, question_command, rag_command, summarize_command
 
 
 def main():
@@ -16,8 +16,12 @@ def main():
     summarize_parser.add_argument("--limit", type=int, default=DEFAULT_SEARCH_LIMIT, help="Maximum number of documents to summarize")
 
     citation_parser = subparsers.add_parser("citations", help="Generate answer with citations")
-    citation_parser.add_argument("query", type=str, help="Search query for summarization")
+    citation_parser.add_argument("query", type=str, help="Search query for answer generation")
     citation_parser.add_argument("--limit", type=int, default=DEFAULT_SEARCH_LIMIT, help="Maximum number of documents to summarize")
+
+    question_parser = subparsers.add_parser("question", help="Generate answer of the question asked")
+    question_parser.add_argument("query", type=str, help="Question to answer")
+    question_parser.add_argument("--limit", type=int, default=DEFAULT_SEARCH_LIMIT, help="Maximum number of documents to use")
 
     args = parser.parse_args()
 
@@ -48,6 +52,15 @@ def main():
             print()
             print("LLM Answer:")
             print(result["summary"])
+
+        case "question":
+            result = question_command(args.query, args.limit)
+            print("Search Results:")
+            for document in result["search_results"]:
+                print(f"  - {document['title']}")
+            print()
+            print("Answer:")
+            print(result["answer"])
         case _:
             parser.print_help()
 
