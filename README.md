@@ -772,3 +772,21 @@ while not done:
 ```
 
 One disadvantage of Agentic RAG is that it makes the whole search slow. So one should use it when need extra interligence.
+
+## Multimodal
+
+To compare images and text, the system needs to represent both in a similar way.
+
+This is done using a technique called Contrastive Learning. In this method, the model is trained on paired data — images and their matching text descriptions. Over millions of examples, the system learns to associate visual features (like shapes and colors) with words.
+
+The image and text are each processed by separate encoder models:
+
+The text encoder takes tokenized text as input.
+
+The image encoder takes pixel values as input.
+
+Both encoders are trained together so that the embeddings (vector representations) of matching image–text pairs are close to each other, while non-matching pairs are far apart.
+
+Through this joint training, the encoders learn to produce embeddings in the same shared vector space — with the same dimensions and normalization — making it possible to directly compare them using similarity metrics like cosine similarity.
+
+In short, contrastive learning trains models by comparing and contrasting examples rather than predicting fixed labels.
