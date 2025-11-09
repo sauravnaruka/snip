@@ -39,6 +39,14 @@ def load_stopwords() -> list[str]:
     with open(STOPWORDS_PATH, "r") as f:
         return f.read().splitlines()
     
+def load_image(image_path) -> bytes:
+    if not os.path.exists(image_path):
+        raise FileNotFoundError(f"Image file not found: {image_path}")
+
+    with open(image_path, "rb") as f:
+        data = f.read()
+    return data
+    
 def format_search_result(
     doc_id: str, title: str, document: str, score: float, **metadata: Any
 ) -> dict[str, Any]:

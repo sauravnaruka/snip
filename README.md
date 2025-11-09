@@ -748,3 +748,27 @@ RAG stands for [Retrieval-Augmented Generation](https://en.wikipedia.org/wiki/Re
 3. **Generate**: LLM generate response with the information agumentation
 
 Sometimes search results disagree. Like user review or feedback. One way to get more balanced response is by building a step in RAG pipeline which simply identifies any conflicts before summarizeing
+
+### Agentic RAG
+
+#### Recursive RAG
+
+Recursive RAG is like a feedback loop. LLM generate answer which contains a partial clues or reframed queries to drive the next search automatically.
+
+#### Agentic
+
+AI Agent is just the process of selecting a tool and using it in a loop. The program give access to tool. Tool can be a method call, a file access or something else. The AI agent select and use the tool.
+
+We can even break up our step-by-step RAG pipeline into a set of tools, and allow the LLM to "run" the pipeline in the order it thinks is best for the query.
+
+```py
+while not done:
+    # Choose tool based on what we learned
+    tool = pick_next_tool(previous_results)
+    # Search with that tool
+    results = tool.search(query)
+    # Update our knowledge
+    previous_results.append(results)
+```
+
+One disadvantage of Agentic RAG is that it makes the whole search slow. So one should use it when need extra interligence.
