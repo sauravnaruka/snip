@@ -790,3 +790,45 @@ Both encoders are trained together so that the embeddings (vector representation
 Through this joint training, the encoders learn to produce embeddings in the same shared vector space — with the same dimensions and normalization — making it possible to directly compare them using similarity metrics like cosine similarity.
 
 In short, contrastive learning trains models by comparing and contrasting examples rather than predicting fixed labels.
+
+### Image Embeddings
+
+One family of models that is well suited to connecting imaages and text is [CLIP](https://openai.com/index/clip/).
+
+Jina AI has a great API for multimodal search that can be used with minimal code.
+
+```py
+import torch
+from PIL import Image
+from transformers import AutoModel
+
+# Get a model
+model = AutoModel.from_pretrained("jinaai/jina-clip-v2", trust_remote_code=True)
+
+# Encode text
+text_embeddings = model.encode_text(["a photo of a cat", "a dog playing fetch"])
+
+# Encode images
+image = Image.open("cat.jpg")
+image_embeddings = model.encode_image([image])
+
+# Calculate similarity
+similarity = torch.cosine_similarity(text_embeddings, image_embeddings)
+```
+
+### Combining Multiple Modalities
+
+With CLIP models, it's even possible to construct hybrid queries that combine text and images.
+
+```py
+# User uploads an image AND types text
+uploaded_image = Image.open("user_upload.jpg")
+text_modifier = "but with bears"
+
+# Encode both inputs
+image_embedding = model.encode_image([uploaded_image])
+text_embedding = model.encode_text([text_modifier])
+
+# Combine embeddings (weighted average)
+combined_query = (0.7 * image_embedding) + (0.3 * text_embedding)
+```
